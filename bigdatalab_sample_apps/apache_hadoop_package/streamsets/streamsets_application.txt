@@ -1,0 +1,100 @@
+﻿Simple Kafka-Jython using StreamSets Data Collector
+
+
+Creating custom Kafka producers and consumers is often a tedious process that requires manual coding. In this tutorial, we'll see how to use StreamSets Data Collector to create data ingest pipelines to write to Kafka using a Kafka Producer, and read from Kafka with a Kafka Consumer with no handwritten code.
+
+
+Goals
+The goal of this tutorial is read Avro files from a file system directory and write them to a Kafka topic using the StreamSets Kafka Producer. We'll then use a second pipeline configured with a Kafka Consumer to drain that topic, perform a set of transformations and send the data to local file system.
+Our dataset
+The tutorial sample data directory contains a set of compressed Avro files that contain simulated credit card transactions in the following JSON format:
+{
+ "transaction_date":"dd/mm/YYYY",
+ "card_number":"0000-0000-0000-0000",
+ "card_expiry_date":"mm/YYYY",
+ "card_security_code":"0000",
+ "purchase_amount":"$00.00",
+ "description":"transaction description of the purchase"
+}
+Part 1 - Publishing to a Kafka Producer
+Creating a Pipeline
+* Launch the Data Collector console and create a new pipeline.
+Defining the Source
+* Drag the Directory origin stage into your canvas.
+* In the Configuration settings below, select the Files tab.
+ Screen Shot 2017-10-12 at 2.18.10 PM.png 
+
+Enter the following settings:
+* Data Format - Avro
+* Files Directory - The absolute file path to the directory containing the sample .avro files.
+* File Name Pattern - cc* - The ccdata file in the samples directory is a bzip2 compressed Avro file. Data Collector will automatically detect and decrypt it on the fly.
+* Files Compression - None. FYI, origins can read compressed Avro files automatically based on the header information in the files. There's no need to configure this property to read compressed Avro files.
+* In the Post Processing tab make sure File Post Processing is set to None.
+* Leave Avro tab as it is.
+Note: The Avro files already contain the schema that the origin will pick up and decode on the fly. If you'd like to override the default schema, enter the custom schema in the Avro tab.
+Defining the Kafka Producer
+* Drag a Kafka Producer destination to the canvas.
+* In the Configuration settings, click the General tab. For Stage Library, select the version of Kafka that matches your environment.
+* Go to the Kafka tab and set the Broker URI property to point to your Kafka broker e.g.<hostname/ip>:<port>. Set Topic to the name of your Kafka topic. And set Data Format to SDC Record.
+ Screen Shot 2017-10-12 at 2.21.43 PM.png 
+
+Preview the Data
+* Feel free to hit the Preview icon to examine the data before executing the pipeline.
+Execute the Pipeline
+* Hit the Start icon. If your Kafka server is up and running, the pipeline should start sending data to Kafka.
+Part 2 - Reading from a Kafka Consumer
+In this part of the tutorial we will setup a pipeline that drains data from a Kafka Consumer, makes a couple of transformations and writes to multiple destinations.
+Defining the source
+* Drag the 'Kafka Consumer' origin stage into your canvas.
+* Go to the 'General' Tab in its configuration and select the version of Kafka that matches your environment in the 'Stage Library' dropdown.
+* In the 'Kafka' Tab pick 'SDC Record' as the Data Format, you may remember from Part 1 of this tutorial we sent data through Kafka in this format, so we want to make sure we decode the incoming data appropriately.
+* Set the Broker URI, Zookeeper URI and topic name to match the settings in your environment.
+ Screen Shot 2017-10-12 at 2.23.20 PM.png 
+
+Jython Evaluator
+* In this stage we'll use a small piece of python code to look at the first few digits of the card number and figure out what type of card it is. We'll add that card type to a new field called 'credit_card_type'.
+Go to the 'Jython' tab of the Jython Evaluator and enter the following piece of code.
+
+
+for record in records:
+ try:
+   cc = record.value['card_number']
+   if cc == '':
+     error.write(record, "Credit Card Number was null")
+     continue
+
+   cc_type = ''
+   if cc.startswith('4'):
+     cc_type = 'Visa'
+   elif cc.startswith(('51','52','53','54','55')):
+     cc_type = 'MasterCard'
+   elif cc.startswith(('34','37')):
+     cc_type = 'AMEX'
+   elif cc.startswith(('300','301','302','303','304','305','36','38')):
+     cc_type = 'Diners Club'
+   elif cc.startswith(('6011','65')):
+     cc_type = 'Discover'
+   elif cc.startswith(('2131','1800','35')):
+     cc_type = 'JCB'
+   else:
+     cc_type = 'Other'
+
+   record.value['credit_card_type'] = cc_type
+   output.write(record)
+
+ except Exception as e:
+   # Send record to error
+   error.write(record, str(e))
+
+Destinations
+1. Add a Local FS destination to the canvas 
+2. Click the Output Files tab and configure the following properties.
+   1. Files Prefix- “_tmp”
+   2. Directory Template- “/<base directory>/tutorial/destination”
+Your Pipeline is ready to run. 
+Note: Make sure that you have setup error files correctly. Here is how you do it -
+In the Properties panel, click the Error Records tab. And for the Error Records property, select Write to File.
+Click the Error Records - Write to File tab and configure the following properties.
+1. Directory- /<base directory>/tutorial/error
+
+reference - https://drive.google.com/open?id=12-yhxS-h0omfnka0sV5lBXrOZK4v8HX0_z7b1nv1Dzw
