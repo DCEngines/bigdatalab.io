@@ -82,5 +82,5 @@ python twitter_producer.py
 
 * Go To The **Twitter-HiveQL** notebook in Notebook drop down, start(run) first para. This is create twitterdb database and tweets table inside hive.
 
-Now you can run any hive query on tweets using **Twitter-HiveQl** notebook. There are few query already present in notebook.
+Now you can run any hive query on tweets using **Twitter-HiveQL** notebook. There are few query already present in notebook.
 
