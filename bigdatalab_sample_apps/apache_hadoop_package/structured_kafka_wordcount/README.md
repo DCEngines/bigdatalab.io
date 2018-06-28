@@ -59,7 +59,7 @@ cd /spark
 * Submit the spark example that counts the word published by the console producer. The code for this application can be found [HERE](https://github.com/apache/spark/blob/branch-2.1/examples/src/main/scala/org/apache/spark/examples/sql/streaming/StructuredKafkaWordCount.scala):
 
 ```bash
-bin/spark-submit  --master spark://10.0.7.2:7077  --jars ./external/kafka-0-10-sql/target/spark-sql-kafka-0-10_2.11-2.1.0.jar  --packages org.apache.spark:spark-streaming-kafka-0-10_2.11:2.1.0  --class org.apache.spark.examples.sql.streaming.StructuredKafkaWordCount   ./examples/target/scala-2.11/jars/spark-examples_2.11-2.1.0.jar   <package_host_ip>:9092 subscribe test
+bin/spark-submit  --master spark://10.0.7.11:7077  --jars ./external/kafka-0-10-sql/target/spark-sql-kafka-0-10_2.11-2.1.0.jar  --packages org.apache.spark:spark-streaming-kafka-0-10_2.11:2.1.0  --class org.apache.spark.examples.sql.streaming.StructuredKafkaWordCount   ./examples/target/scala-2.11/jars/spark-examples_2.11-2.1.0.jar   <package_host_ip>:9092 subscribe test
 ```
 
 ### Running the App
