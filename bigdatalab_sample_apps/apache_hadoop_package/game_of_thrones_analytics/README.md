@@ -141,7 +141,7 @@ cd /spark
 * Connect Spark master to cassandra:
 
 ```bash
-bin/spark-shell --master spark://10.0.7.2:7077 --packages datastax:spark-cassandra-connector:2.0.5-s_2.11 --conf spark.cassandra.connection.host=10.0.7.5
+bin/spark-shell --master spark://10.0.7.11:7077 --packages datastax:spark-cassandra-connector:2.0.5-s_2.11 --conf spark.cassandra.connection.host=10.0.7.5
 ```
 
 * And on the spark-shell(```scala>```), create a Dataframe on the Cassandra table and peek into it.
@@ -175,7 +175,7 @@ scala> spark.sql("select defender_king, count(*) battles from battlesTable group
 * Let's try out some analysis with Spark R. Start a Spark R shell with Cassandra connector.
 
 ```bash
-./bin/sparkR --master spark://10.0.7.2:7077 --packages datastax:spark-cassandra-connector:2.0.5-s_2.11 --conf spark.cassandra.connection.host=10.0.7.5
+./bin/sparkR --master spark://10.0.7.11:7077 --packages datastax:spark-cassandra-connector:2.0.5-s_2.11 --conf spark.cassandra.connection.host=10.0.7.5
 ```
 
 * Create a DataFrame that points to the Cassandra's table. And create a temporary table out of it. 
