@@ -34,13 +34,13 @@ cd /kafka
 * Create a Kafka topic, let's say "test":
 
 ```bash
-bin/kafka-topics.sh --create --zookeeper hl-kafka:2181 --replication-factor 1 --partitions 1 --topic test
+bin/kafka-topics.sh --create --zookeeper <kakfa-container-name>:2181 --replication-factor 1 --partitions 1 --topic test
 ```
 
 * Start a console producer. Input from the console is send to the Kafka partition:
 
 ```bash
-bin/kafka-console-producer.sh --broker-list hl-kafka:9092 --topic test
+bin/kafka-console-producer.sh --broker-list <kakfa-container-name>:9092 --topic test
 ```
 Leave this terminal as it is.
 
