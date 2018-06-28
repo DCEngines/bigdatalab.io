@@ -22,9 +22,8 @@ ssh root@<package_host_ip>
 ```
 
 * Go into Cassandra container:
-
 ```bash
-docker exec -it hl-cassandra bash
+ssh root@172.26.201.23 -p 7789 
 ```
 
 
